@@ -193,7 +193,7 @@ extern "C" {
       VERSION,           // Version
       SP_CONTROL,        // Flags
       PLUGIN_TYPE_NORTH, // Type
-      "0.0.1",           // Interface version
+      VERSION,           // Interface version
       default_config     // Configuration
   };
 

@@ -129,7 +129,6 @@ void IEC61850Config::importProtocolConfig(const std::string &protocolConfig)
   if (document.Parse(const_cast<char *>(protocolConfig.c_str()))
           .HasParseError()) {
     Iec61850Utility::log_fatal("Parsing error in protocol configuration");
-    Iec61850Utility::log_debug("Parsing error in protocol configuration\n");
     return;
   }
 
@@ -163,8 +162,6 @@ void IEC61850Config::importProtocolConfig(const std::string &protocolConfig)
             "transport_layer.port value out of range-> using default port");
       }
     } else {
-      Iec61850Utility::log_debug(
-          "transport_layer.port has invalid type -> using default port\n");
       Iec61850Utility::log_warn(
           "transport_layer.port has invalid type -> using default port");
     }
@@ -175,12 +172,11 @@ void IEC61850Config::importProtocolConfig(const std::string &protocolConfig)
       if (isValidIPAddress(transportLayer["srv_ip"].GetString())) {
         m_ip = transportLayer["srv_ip"].GetString();
 
-        Iec61850Utility::log_debug("Using local IP address: %s\n",
+        Iec61850Utility::log_debug("Using local IP address: %s",
                                    m_ip.c_str());
 
         m_bindOnIp = true;
       } else {
-        printf("transport_layer.srv_ip is not a valid IP address -> ignore\n");
         Iec61850Utility::log_warn(
             "transport_layer.srv_ip has invalid type -> not using TLS");
       }
@@ -289,7 +285,7 @@ void IEC61850Config::importExchangeConfig(const std::string &exchangeConfig,
       const std::string objRef = protocol[JSON_PROT_OBJ_REF].GetString();
       const std::string typeIdStr = protocol[JSON_PROT_CDC].GetString();
 
-      Iec61850Utility::log_info("  address: %s type: %s label: %s \n ",
+      Iec61850Utility::log_info("  address: %s type: %s label: %s",
                                 objRef.c_str(), typeIdStr.c_str(),
                                 label.c_str());
       int typeId = IEC61850Datapoint::getCdcTypeFromString(typeIdStr);

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 MZ Automation GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 #include "iec61850_config.hpp"
 #include "iec61850_datapoint.hpp"
 #include "logger.h"
@@ -19,22 +35,6 @@
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
-/*
- * Copyright 2023 MZ Automation GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 #include <stdbool.h>
 #include <string>
 #include <thread>
@@ -395,40 +395,36 @@ Datapoint *IEC61850Server::buildPivotOperation(CDCTYPE type, MmsValue *ctlVal,
                                                bool test, bool isSelect,
                                                const std::string &label,
                                                PivotTimestamp *timestamp,
-                                               bool hasSelect) {
+                                               bool hasSelect)
+{
   long seconds = timestamp->SecondSinceEpoch();
   long fraction = timestamp->FractionOfSecond();
 
   Datapoint *rootDp = createDp("GTIC");
-  Datapoint *comingFrom =
-      addElementWithValue(rootDp, "ComingFrom", (std::string) "iec61850");
+
+  addElementWithValue(rootDp, "ComingFrom", (std::string) "iec61850");
+  
   Datapoint *typeDp = addElement(rootDp, cdcToString(type));
-  Datapoint *identifierDp =
-      addElementWithValue(rootDp, "Identifier", (std::string)label);
+  addElementWithValue(rootDp, "Identifier", (std::string)label);
 
   if (hasSelect) {
     Datapoint *selectDp = addElement(rootDp, "Select");
-    Datapoint *selectStVal =
-        addElementWithValue(selectDp, "stVal", (long)isSelect);
+    addElementWithValue(selectDp, "stVal", (long)isSelect);
   }
 
   Datapoint *qualityDp = addElement(typeDp, "q");
-  Datapoint *testDp = addElementWithValue(qualityDp, "test", (long)test);
+  addElementWithValue(qualityDp, "test", (long)test);
 
   Datapoint *tsDp = addElement(typeDp, "t");
-  Datapoint *secondSinceEpoch =
-      addElementWithValue(tsDp, "SecondSinceEpoch", (long)seconds);
-  Datapoint *fractionOfSecond =
-      addElementWithValue(tsDp, "FractionOfSecond", (long)fraction);
-
-  Datapoint *ctlValDp = nullptr;
+  addElementWithValue(tsDp, "SecondSinceEpoch", (long)seconds);
+  addElementWithValue(tsDp, "FractionOfSecond", (long)fraction);
 
   if (isSelect) {
     return rootDp;
   }
   switch (type) {
   case SPC: {
-    ctlValDp = addElementWithValue(typeDp, "ctlVal",
+    addElementWithValue(typeDp, "ctlVal",
                                    (long)MmsValue_getBoolean(ctlVal));
     break;
   }
@@ -443,17 +439,15 @@ Datapoint *IEC61850Server::buildPivotOperation(CDCTYPE type, MmsValue *ctlVal,
       strVal = "on";
     else if (value == 3)
       strVal = "bad-state";
-    ctlValDp = addElementWithValue(typeDp, "ctlVal", (std::string)strVal);
+    addElementWithValue(typeDp, "ctlVal", (std::string)strVal);
     break;
   }
   case INC: {
-    ctlValDp =
-        addElementWithValue(typeDp, "ctlVal", (long)MmsValue_toInt32(ctlVal));
+    addElementWithValue(typeDp, "ctlVal", (long)MmsValue_toInt32(ctlVal));
     break;
   }
   case APC: {
-    ctlValDp =
-        addElementWithValue(typeDp, "ctlVal", (double)MmsValue_toFloat(ctlVal));
+    addElementWithValue(typeDp, "ctlVal", (double)MmsValue_toFloat(ctlVal));
     break;
   }
   case BSC: {
@@ -467,7 +461,7 @@ Datapoint *IEC61850Server::buildPivotOperation(CDCTYPE type, MmsValue *ctlVal,
       strVal = "higher";
     else if (value == 3)
       strVal = "reserved";
-    ctlValDp = addElementWithValue(typeDp, "ctlVal", (std::string)strVal);
+    addElementWithValue(typeDp, "ctlVal", (std::string)strVal);
     break;
   }
   default: {
@@ -475,6 +469,7 @@ Datapoint *IEC61850Server::buildPivotOperation(CDCTYPE type, MmsValue *ctlVal,
     return nullptr;
   }
   }
+
   return rootDp;
 }
 
@@ -676,8 +671,11 @@ IEC61850Server::writeAccessHandler(DataAttribute *dataAttribute,
 ControlHandlerResult IEC61850Server::controlHandler(ControlAction action,
                                                     void *parameter,
                                                     MmsValue *value,
-                                                    bool test) {
+                                                    bool test)
+{
   IEC61850Server *self = (IEC61850Server *)parameter;
+
+  (void)self;
 
   Iec61850Utility::log_info("control handler called");
   Iec61850Utility::log_info("  ctlNum: %i", ControlAction_getCtlNum(action));
@@ -690,6 +688,7 @@ ControlHandlerResult IEC61850Server::controlHandler(ControlAction action,
   } else {
     Iec61850Utility::log_warn("clientCon == NULL!");
   }
+
   return CONTROL_RESULT_OK;
 }
 
@@ -807,9 +806,10 @@ void IEC61850Server::registerControl(
   Iec61850Utility::log_warn("RegisterControl is called"); // LCOV_EXCL_LINE
 }
 
-uint32_t IEC61850Server::send(const std::vector<Reading *> &readings) {
+uint32_t IEC61850Server::send(const std::vector<Reading *> &readings)
+{
   int n = 0;
-  int i = 0;
+
   if (!m_server) {
     Iec61850Utility::log_fatal("NO SERVER");
     return 0;
@@ -851,9 +851,6 @@ uint32_t IEC61850Server::send(const std::vector<Reading *> &readings) {
                                      dp->toJSONProperty().c_str());
           continue;
         }
-
-        PIVOTROOT root = (PIVOTROOT)IEC61850Datapoint::getCDCRootFromString(
-            rootDp->getName());
 
         Datapoint *identifierDp = getChild(rootDp, "Identifier");
 
