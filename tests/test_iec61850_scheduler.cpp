@@ -62,7 +62,7 @@ static const char* default_config = QUOTE({
   "modelPath" : {
     "description" : "Path of the model config file to read",
     "type" : "string",
-    "default" : "/home/develop/fledgepower/iec61850/fledge-iec61850-north-scheduler/tests/data/schedulermodel.cfg",
+    "default" : "tests/data/schedulermodel.cfg",
     "order": "3",
     "displayName": "Path Of File"
 },
@@ -232,7 +232,7 @@ TEST_F(SchedulerTest, RunSimpleSchedule) {
     PLUGIN_HANDLE handle = plugin_init(&config, NULL, NULL);
     plugin_register(handle, NULL, operateHandler);
 
-    Thread_sleep(500); /* wait for the server to start */
+    Thread_sleep(1500); /* wait for the server to start */
 
     IedClientError err;
 // Create connection
