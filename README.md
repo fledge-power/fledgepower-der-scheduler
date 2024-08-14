@@ -1,4 +1,5 @@
 # fledgepower-der-scheduler
+
 IEC-scheduling (or DER-scheduling) is a specific form of scheduling with a lot of properties that should not be confused with any generic scheduling such also as in IT
 
 This project implements an IEC 61850 server/north plugin for fledgepower. Its main purpose is to implement a DER scheduler.
@@ -12,7 +13,7 @@ To install the dependencies you can run the requirements.sh script.
 
 If you want to install them manually :
 
-To build IEC61850 C/C++ North plugin, you need to download lib61850 at:
+To build IEC61850 C/C++ North plugin, you need to download libiec61850 at:
 https://github.com/mz-automation/libiec61850
 
 ```bash
@@ -122,14 +123,15 @@ Examples:
 Using the plugin
 ----------------
 
+First you have to copy the plugin shared-object file (libiec61850.so) into the fledgepower installation in the folder plugins/north/iec61850.
+If this folder doesn't exist you have to create it first.
+
 As described in the Fledge documentation, you can use the plugin by adding
-a service from a terminal, or from the web API.C
+a service from a terminal, or from the web API.
 
-1 - Add the service from a terminal:
+1) Add the service from a terminal:
 
-.. code-block:: console
-
-$ curl -sX POST http://localhost:8081/fledge/scheduled/task -d '{"name": "iec61850","plugin": "iec104","type": "north","schedule_type": 3,"schedule_day": 0,"schedule_time": 0,"schedule_repeat": 30,"schedule_enabled": true}' ; echo
+  $ curl -sX POST http://localhost:8081/fledge/scheduled/task -d '{"name": "iec61850","plugin": "iec61850","type": "north","schedule_type": 3,"schedule_day": 0,"schedule_time": 0,"schedule_repeat": 30,"schedule_enabled": true}' ; echo
 
 Or
 
@@ -137,6 +139,6 @@ Or
 
 - On the web GUI, go to the North tab
 - Click on "Add +"
-- Select iec104 and give it a name, then click on "Next"
+- Select iec61850 and give it a name, then click on "Next"
 - Change the default settings to your settings, then click on "Next"
 - Let the "Enabled" option checked, then click on "Done"
